@@ -1,0 +1,20 @@
+## Default configuration for standalone mode (every daemons on one node with default settings)
+
+# Path to mesos distribution built properly
+# java.library.path: "native:/Users/davodroid/dev/mesos/mesos-0.17.0/build/.libs"
+
+# hostname:port of the mesos master node
+mesos.master.url: "zk://localhost:2181/mesos"
+
+# in cluster ENV, change it to a globally accessible directory (HDFS or NFS etc.)
+mesos.executor.uri: "/Users/davodroid/dev/mesos/storm-mesos-0.9.1-incubating.tgz"
+
+# hostname:port of zookeeper nodes (default port 2181)
+storm.zookeeper.servers:
+- "localhost"
+
+# hostname of nimbus node
+nimbus.host: "localhost"
+
+# full path of storm local working directory
+storm.local.dir: "/usr/local/storm-local"
