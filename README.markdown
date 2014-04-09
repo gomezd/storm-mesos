@@ -1,7 +1,83 @@
-Build of storm-mesos using mesos-0.17.0 and storm-0.9.1-incubating
+# Build of storm-mesos using mesos-0.17.0 and storm-0.9.1-incubating
 
+## Running storm on mesos
 
+- Get Zookeeper
 
+See http://zookeeper.apache.org/doc/trunk/zookeeperStarted.html#sc_InstallingSingleMode
+
+- Download and build mesos
+
+```bash
+wget http://www.apache.org/dist/mesos/0.17.0/mesos-0.17.0.tar.gz
+tar -zxf mesos-0.17.0.tar.gz
+
+# Change working directory.
+$ cd mesos-0.17.0
+
+# Configure and build.
+$ mkdir build
+$ cd build
+$ ../configure
+$ make
+
+# Run test suite.
+$ make check
+
+# Install (***Optional***).
+$ make install
+```
+see http://mesos.apache.org/gettingstarted/
+
+- Start mesos
+```bash
+# mesos master
+mesos-0.17.0/build/bin/mesos-master.sh --zk=zk://localhost:2181/mesos &
+
+# mesos slave
+mesos-0.17.0/build/bin/mesos-slave.sh --master=zk://localhost:2181/mesos &
+```
+
+You can see the mesos UI in localhost:5050
+
+- Configure `conf/storm.yaml`
+```yaml
+## Default configuration for standalone mode (every daemons on one node with default settings)
+
+# Path to mesos distribution built properly
+# java.library.path: "native:/path/to/mesos-0.17.0/build/.libs"
+
+# hostname:port of the mesos master node
+mesos.master.url: "zk://localhost:2181/mesos"
+
+# in cluster ENV, change it to a globally accessible directory (HDFS or NFS etc.)
+mesos.executor.uri: "/path/to/storm-mesos-0.9.1-incubating.tgz"
+
+# hostname:port of zookeeper nodes (default port 2181)
+storm.zookeeper.servers:
+- "localhost"
+
+# hostname of nimbus node
+nimbus.host: "localhost"
+
+# full path of storm local working directory
+storm.local.dir: "/usr/local/storm-local"
+```
+
+- Start storm
+```bash
+bin/storm-mesos nimbus &
+bin/storm supervisor &
+bin/storm ui
+```
+You can see the storm ui on localhost:8080 and you will see storm registered as a mesos framework.
+
+- Download storm-starter and send topologies to the storm cluster
+```bash
+apache-storm-0.9.1-incubating/bin/storm jar storm-starter-0.0.1-SNAPSHOT.jar storm.starter.WordCountTopology count 
+```
+
+-------------------
 
 
 Storm is a distributed realtime computation system. Similar to how Hadoop provides a set of general primitives for doing batch processing, Storm provides a set of general primitives for doing realtime computation. Storm is simple, can be used with any programming language, [is used by many companies](https://github.com/nathanmarz/storm/wiki/Powered-By), and is a lot of fun to use!
